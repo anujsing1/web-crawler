@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import csv
 
 def extract_span_values(html_content,zip_code):
     soup = BeautifulSoup(html_content, 'lxml')
@@ -43,12 +44,25 @@ def process_zipcodes(file_path, endpoint_url):
         html_content = get_html_for_zip(zip_code, endpoint_url)
         if html_content:
             span_values = extract_span_values(html_content,zip_code)
-            print(f"Span values for zip code {zip_code}:")
-            for value in span_values:
-                print(value)
+            print(f"extracting for zip code {zip_code}")
+            # Define the fields that will be used as column headers in the CSV file
+            fields = ['zip_code', 'provider', 'start_at','speed','connection_type','availablity']
+            # Open a file called 'EmployeeData.csv' in write mode ('w') and use it as a context manager
+            # The 'with' statement ensures that the file is automatically closed when the block of code is finished
+            with open('output.csv', 'w') as f:
+                # Create a CSV writer object that will write to the file 'f'
+                csv_writer = csv.writer(f)
+                
+                # Write the field names (column headers) to the first row of the CSV file
+                csv_writer.writerow(fields)
+                
+                # Write all of the rows of data to the CSV file
+                csv_writer.writerows(span_values)
+            print(f"values for zip code {zip_code} extracted")
 
 if __name__ == "__main__":
     # Path to your HTML file
-    zipcodes_file_path = '/Users/anujsingh/Desktop/web-crawler/zip.txt'
+    zipcodes_file_path = 'C:\\Users\\Administrator\\Downloads\\web-crawler-master\\web-crawler-master\\zip.txt'
     endpoint_url = 'https://broadbandnow.com/New-Jersey/Edison'
     process_zipcodes(zipcodes_file_path, endpoint_url)
+    print(f"Work Completed!!!")
